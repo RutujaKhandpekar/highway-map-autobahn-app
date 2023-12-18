@@ -40,13 +40,23 @@ export class AppComponent {
 
   generateMarkerData(selectedRoadData: any) {
     selectedRoadData.forEach(
-      (data: { coordinate: { lat: any; long: any }; title: any }) => {
+      (data: {
+        label: any;
+        coordinate: { lat: any; long: any };
+        title: any;
+      }) => {
         this.markers.push({
           position: {
             lat: parseFloat(data.coordinate.lat),
             lng: parseFloat(data.coordinate.long),
           },
           title: data.title,
+          label: {
+            text: String.fromCharCode(parseInt(data.label)), // codepoint from https://fonts.google.com/icons
+            fontFamily: 'Material Icons',
+            color: '#ffffff',
+            fontSize: '18px',
+          },
           options: { animation: google.maps.Animation.DROP },
         });
       }

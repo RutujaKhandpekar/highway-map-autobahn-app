@@ -44,6 +44,7 @@ export class MapService {
     ]).subscribe({
       next: (result: any) => {
         highwayData.roadWorks = result[0].roadworks;
+        highwayData.roadWorks.label = 'ea3c';
         highwayData.webCams = result[1].webcam;
         highwayData.parkingLorries = result[2].parking_lorry;
         highwayData.warnings = result[3].warning;
