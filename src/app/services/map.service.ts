@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Constants } from '../config/constants';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,27 +9,62 @@ import { forkJoin } from 'rxjs';
 export class MapService {
   constructor(private http: HttpClient) {}
 
-  // getHighways(): any {
-  //   let highways;
-  //   this.http.get<any>(Constants.GET_HIGHWAYS).subscribe((data) => {
-  //     highways = data;
-  //   });
-  //   return highways;
-  // }
+  getHighwayData(roadId: any): any {
+    let highwayData: any = {};
+    const getRoadworks = this.http
+      .get(Constants.GET_HIGHWAYS + roadId + Constants.GET_ROADWORKS)
+      .pipe(catchError((error) => of(error)));
+    const getWebcams = this.http
+      .get(Constants.GET_HIGHWAYS + roadId + Constants.GET_WEBCAMS)
+      .pipe(catchError((error) => of(error)));
+    const getParkingLorries = this.http
+      .get(Constants.GET_HIGHWAYS + roadId + Constants.GET_PARKING_LORRY)
+      .pipe(catchError((error) => of(error)));
+    const getWarnings = this.http
+      .get(Constants.GET_HIGHWAYS + roadId + Constants.GET_WARNING)
+      .pipe(catchError((error) => of(error)));
+    const getClosures = this.http
+      .get(Constants.GET_HIGHWAYS + roadId + Constants.GET_CLOSURE)
+      .pipe(catchError((error) => of(error)));
+    const getElectricChargingStations = this.http
+      .get(
+        Constants.GET_HIGHWAYS +
+          roadId +
+          Constants.GET_ELECTRIC_CHARGING_STATION
+      )
+      .pipe(catchError((error) => of(error)));
+
+    forkJoin([
+      getRoadworks,
+      getWebcams,
+      getParkingLorries,
+      getWarnings,
+      getClosures,
+      getElectricChargingStations,
+    ]).subscribe({
+      next: (result: any) => {
+        highwayData.roadWorks = result[0].roadworks;
+        highwayData.webCams = result[1].webcam;
+        highwayData.parkingLorries = result[2].parking_lorry;
+        highwayData.warnings = result[3].warning;
+        highwayData.closures = result[4].closure;
+        highwayData.electricChargingStations =
+          result[5].electric_charging_station;
+      },
+      error: (error) => console.log(error),
+    });
+    return highwayData;
+  }
 
   getMapsData(): any {
-    let mapsData;
-    this.http.get<any>(Constants.GET_HIGHWAYS).subscribe((data) => {
-      const getRoadworks = this.http.get(
-        Constants.GET_HIGHWAYS + data.roads[0] + Constants.GET_ROADWORKS
-      );
-      const getWebcams = this.http.get(
-        Constants.GET_HIGHWAYS + data.roads[0] + Constants.GET_WEBCAMS
-      );
-      forkJoin([getRoadworks, getWebcams]).subscribe((result) => {
-        mapsData = result;
+    let mapsData: any = {};
+
+    this.http.get<any>(Constants.GET_HIGHWAYS).subscribe((highways) => {
+      highways.roads.forEach((roadId: any) => {
+        mapsData[roadId] = this.getHighwayData(roadId);
       });
     });
+
     return mapsData;
   }
 }

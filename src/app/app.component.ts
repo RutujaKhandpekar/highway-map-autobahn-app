@@ -1,10 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 
 import { GoogleMapsModule } from '@angular/google-maps';
-import { HttpClient } from '@angular/common/http';
-import { Constants } from './config/constants';
 import { MapService } from './services/map.service';
 
 @Component({
@@ -15,33 +13,13 @@ import { MapService } from './services/map.service';
   styleUrls: ['./app.component.less'],
 })
 export class AppComponent {
-  webcams: any;
-  roadWorks: any;
+  mapsData: any;
   markers: any[] = [];
   constructor(private mapService: MapService) {}
 
   ngOnInit() {
-    const mapsData = this.mapService.getMapsData();
-    this.roadWorks = mapsData[0];
-    this.webcams = mapsData[1];
-    console.log(this.roadWorks);
-    console.log(this.webcams);
-
+    this.mapsData = this.mapService.getMapsData();
     this.addMarker();
-
-    // this.http.get<any>(Constants.GET_HIGHWAYS).subscribe((data) => {
-    //   this.highways = data;
-    // });
-    // console.log(this.highways);
-    // const road = this.highways.roads[0];
-    // this.http
-    //   .get<any>(
-    //     'https://verkehr.autobahn.de/o/autobahn/' + road + '/services/roadworks'
-    //   )
-    //   .subscribe((data) => {
-    //     this.roadWorks = data;
-    //     console.log(this.roadWorks);
-    //   });
   }
 
   display: any;
@@ -60,18 +38,26 @@ export class AppComponent {
     if (event.latLng != null) this.display = event.latLng.toJSON();
   }
 
-  addMarker() {
-    this.roadWorks.roadworks.forEach(
-      (roadWork: { coordinate: { lat: any; long: any }; title: any }) => {
+  generateMarkerData(selectedRoadData: any) {
+    selectedRoadData.forEach(
+      (data: { coordinate: { lat: any; long: any }; title: any }) => {
         this.markers.push({
           position: {
-            lat: parseFloat(roadWork.coordinate.lat),
-            lng: parseFloat(roadWork.coordinate.long),
+            lat: parseFloat(data.coordinate.lat),
+            lng: parseFloat(data.coordinate.long),
           },
-          title: roadWork.title,
+          title: data.title,
           options: { animation: google.maps.Animation.DROP },
         });
       }
     );
+  }
+
+  addMarker() {
+    for (let road in this.mapsData) {
+      for (let roadData in this.mapsData[road]) {
+        this.generateMarkerData(this.mapsData[road][roadData]);
+      }
+    }
   }
 }
