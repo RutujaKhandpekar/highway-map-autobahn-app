@@ -1,6 +1,15 @@
 import { Injectable } from '@angular/core';
 @Injectable()
 export class Constants {
+  public static ROAD_FILTERS = [
+    'Roadworks',
+    'Webcams',
+    'Parking Lorry',
+    'Warning',
+    'Closure',
+    'Electric Charging Station',
+  ];
+
   public static GET_HIGHWAYS: string =
     'https://verkehr.autobahn.de/o/autobahn/';
 
