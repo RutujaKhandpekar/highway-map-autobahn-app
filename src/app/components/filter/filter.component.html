@@ -1,6 +1,9 @@
 <mat-form-field>
   <mat-label>Select Road</mat-label>
-  <mat-select (selectionChange)="onRoadSelection($event.value)">
+  <mat-select
+    (selectionChange)="onRoadSelection($event.value)"
+    [(value)]="roads[0]"
+  >
     @for (road of roads; track road) {
     <mat-option [value]="road">{{ road }}</mat-option>
     }

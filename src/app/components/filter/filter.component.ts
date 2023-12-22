@@ -22,6 +22,7 @@ export class FilterComponent {
 
   ngOnInit() {
     this.roads = this.mapService.getRoads();
+    this.selectedRoad = this.roads[0]; // By default 0th road is selected in the filter
   }
 
   onRoadSelection(value: string) {

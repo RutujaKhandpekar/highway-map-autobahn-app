@@ -1,29 +1,41 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
 
-import { GoogleMapsModule } from '@angular/google-maps';
+import {
+  GoogleMapsModule,
+  MapInfoWindow,
+  MapMarker,
+} from '@angular/google-maps';
 import { MapService } from './services/map.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { FilterComponent } from './components/filter/filter.component';
+import { MatGridListModule } from '@angular/material/grid-list';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     CommonModule,
-    RouterOutlet,
     GoogleMapsModule,
     MatToolbarModule,
     FilterComponent,
+    MatGridListModule,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.less'],
 })
 export class AppComponent {
+  @ViewChild(MapInfoWindow, { static: false })
+  infoWindow!: MapInfoWindow;
   mapsData: any;
   markers: any[] = [];
+  infoContent: any;
   constructor(private mapService: MapService) {}
+
+  openInfo(marker: MapMarker, content: any) {
+    this.infoContent = content;
+    this.infoWindow.open(marker);
+  }
 
   ngOnInit() {
     this.mapsData = this.mapService.getMapsData();
@@ -55,6 +67,10 @@ export class AppComponent {
     this.markers = [];
     selectedRoadData.forEach(
       (data: {
+        subtitle: any;
+        startTimestamp: any;
+        identifier: any;
+        display_type: any;
         label: any;
         coordinate: { lat: any; long: any };
         title: any;
@@ -72,6 +88,10 @@ export class AppComponent {
           //   fontSize: '18px',
           // },
           options: { animation: google.maps.Animation.DROP },
+          subtitle: data.subtitle,
+          startTimestamp: data.startTimestamp,
+          identifier: data.identifier,
+          displayType: data.display_type,
         });
       }
     );

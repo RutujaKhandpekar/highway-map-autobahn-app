@@ -1,7 +1,4 @@
 <mat-toolbar color="primary">{{ title }}</mat-toolbar>
-
-<!-- this creates a google map on the page with the given lat/lng from -->
-<!-- the component as the initial center of the map: -->
 <google-map
   height="500px"
   width="900px"
@@ -11,12 +8,17 @@
   (mapMousemove)="move($event)"
 >
   <map-marker
+    #markerElem="mapMarker"
     *ngFor="let marker of markers"
     [position]="marker.position"
     [label]="marker.label"
     [title]="marker.title"
     [options]="marker.options"
+    (mapClick)="openInfo(markerElem, marker.title)"
   >
+    <map-info-window>
+      <div [innerHTML]="infoContent"></div>
+    </map-info-window>
   </map-marker>
 </google-map>
 <app-filter (newMarkerEvent)="updateMarker($event)"></app-filter>
