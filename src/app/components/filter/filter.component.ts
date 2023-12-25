@@ -1,4 +1,9 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Output,
+  EventEmitter,
+  ViewEncapsulation,
+} from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MapService } from '../../services/map.service';
@@ -11,6 +16,7 @@ import { Constants } from '../../config/constants';
   imports: [MatSelectModule, MatFormFieldModule, MatRadioModule],
   templateUrl: './filter.component.html',
   styleUrl: './filter.component.less',
+  encapsulation: ViewEncapsulation.None,
 })
 export class FilterComponent {
   constructor(private mapService: MapService) {}
@@ -33,6 +39,9 @@ export class FilterComponent {
     this.mapService.getFilteredData(this.selectedRoad, value).subscribe({
       next: (result: any) => {
         this.newMarkerEvent.emit(result);
+        if (result && !result[Object.keys(result)[0]]?.length) {
+          alert('No ' + Object.keys(result)[0] + ' found on selected road.');
+        }
       },
       error: (error: any) => console.log(error),
     });

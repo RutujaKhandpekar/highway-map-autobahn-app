@@ -72,11 +72,9 @@ export class MapService {
 
   getRoads(): any {
     let roads: any = [];
-
     this.http.get<any>(Constants.GET_HIGHWAYS).subscribe((highways) => {
       roads = highways.roads;
     });
-
     return roads;
   }
 

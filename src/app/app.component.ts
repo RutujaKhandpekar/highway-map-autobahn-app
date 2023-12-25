@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import {
@@ -23,25 +23,11 @@ import { MatGridListModule } from '@angular/material/grid-list';
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.less'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AppComponent {
   @ViewChild(MapInfoWindow, { static: false })
   infoWindow!: MapInfoWindow;
-  mapsData: any;
-  markers: any[] = [];
-  infoContent: any;
-  constructor(private mapService: MapService) {}
-
-  openInfo(marker: MapMarker, content: any) {
-    this.infoContent = content;
-    this.infoWindow.open(marker);
-  }
-
-  ngOnInit() {
-    this.mapsData = this.mapService.getMapsData();
-    this.addMarker();
-  }
-
   display: any;
   center: google.maps.LatLngLiteral = {
     lat: 51.1657,
@@ -49,6 +35,20 @@ export class AppComponent {
   };
   zoom = 6;
   title = 'Autoban Highway Map';
+  mapsData: any;
+  markers: any[] = [];
+  infoContent: any;
+  constructor(private mapService: MapService) {}
+
+  openInfo(marker: MapMarker, data: any) {
+    this.infoContent = data.title;
+    this.infoWindow.open(marker);
+  }
+
+  ngOnInit() {
+    this.mapsData = this.mapService.getMapsData();
+    this.addMarker();
+  }
 
   moveMap(event: google.maps.MapMouseEvent) {
     if (event.latLng != null) this.center = event.latLng.toJSON();
@@ -60,11 +60,11 @@ export class AppComponent {
 
   updateMarker(filteredMarkerData: any) {
     let data = filteredMarkerData[Object.keys(filteredMarkerData)[0]];
-    this.generateMarkerData(data);
+    this.generateMarkerData(data, true);
   }
 
-  generateMarkerData(selectedRoadData: any) {
-    this.markers = [];
+  generateMarkerData(selectedRoadData: any, isFilteredResult: boolean) {
+    if (isFilteredResult) this.markers = [];
     selectedRoadData.forEach(
       (data: {
         subtitle: any;
@@ -81,12 +81,6 @@ export class AppComponent {
             lng: parseFloat(data.coordinate.long),
           },
           title: data.title,
-          // label: {
-          //   text: String.fromCharCode(parseInt(data.label)), // codepoint from https://fonts.google.com/icons
-          //   fontFamily: 'Material Icons',
-          //   color: '#ffffff',
-          //   fontSize: '18px',
-          // },
           options: { animation: google.maps.Animation.DROP },
           subtitle: data.subtitle,
           startTimestamp: data.startTimestamp,
@@ -100,7 +94,7 @@ export class AppComponent {
   addMarker() {
     for (let road in this.mapsData) {
       for (let roadData in this.mapsData[road]) {
-        this.generateMarkerData(this.mapsData[road][roadData]);
+        this.generateMarkerData(this.mapsData[road][roadData], false);
       }
     }
   }

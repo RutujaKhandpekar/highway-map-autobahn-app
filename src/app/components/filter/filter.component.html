@@ -1,20 +1,26 @@
-<mat-form-field>
-  <mat-label>Select Road</mat-label>
-  <mat-select
-    (selectionChange)="onRoadSelection($event.value)"
-    [(value)]="roads[0]"
-  >
-    @for (road of roads; track road) {
-    <mat-option [value]="road">{{ road }}</mat-option>
+<div class="filter-section">
+  <div>
+    <h4 class="filters-heading">Filter Your Result</h4>
+    <mat-form-field>
+      <mat-label>Select Road</mat-label>
+      <mat-select
+        (selectionChange)="onRoadSelection($event.value)"
+        [(value)]="roads[0]"
+      >
+        @for (road of roads; track road) {
+        <mat-option [value]="road">{{ road }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <h5>Select Category</h5>
+  <mat-radio-group aria-label="Select an option" class="example-radio-group">
+    @for (filter of roadFilters; track filter) {
+    <mat-radio-button
+      [value]="filter"
+      (change)="onFilterSelection($event.value)"
+      >{{ filter }}</mat-radio-button
+    >
     }
-  </mat-select>
-</mat-form-field>
-<mat-radio-group aria-label="Select an option">
-  @for (filter of roadFilters; track filter) {
-  <mat-radio-button
-    [value]="filter"
-    (change)="onFilterSelection($event.value)"
-    >{{ filter }}</mat-radio-button
-  >
-  }
-</mat-radio-group>
+  </mat-radio-group>
+</div>
