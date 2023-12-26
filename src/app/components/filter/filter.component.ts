@@ -32,6 +32,31 @@ export class FilterComponent {
     this.selectedRoad = this.roads[0]; // By default 0th road is selected in the filter
   }
 
+  addMarkerIconData() {
+    let markerPathAndColor: any = {};
+    switch (this.selectedFilter) {
+      case 'Roadworks':
+        markerPathAndColor = Constants.MARKER_ICON.Roadworks;
+        break;
+      case 'Webcams':
+        markerPathAndColor = Constants.MARKER_ICON.Webcams;
+        break;
+      case 'Parking Lorry':
+        markerPathAndColor = Constants.MARKER_ICON['Parking Lorry'];
+        break;
+      case 'Warning':
+        markerPathAndColor = Constants.MARKER_ICON.Warning;
+        break;
+      case 'Closure':
+        markerPathAndColor = Constants.MARKER_ICON.Closure;
+        break;
+      case 'Electric Charging Station':
+        markerPathAndColor = Constants.MARKER_ICON['Electric Charging Station'];
+        break;
+    }
+    return markerPathAndColor;
+  }
+
   getFilteredData() {
     if (this.selectedFilter === 'All') {
       let filteredData: any = {};
@@ -51,6 +76,8 @@ export class FilterComponent {
         .getFilteredData(this.selectedRoad, this.selectedFilter)
         .subscribe({
           next: (filteredData: any) => {
+            filteredData[Object.keys(filteredData)[0]].markerIcon =
+              this.addMarkerIconData();
             this.newMarkerEvent.emit({
               filteredData,
               selectedOption: this.selectedFilter,

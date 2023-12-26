@@ -1,9 +1,5 @@
-# Dockerfile
-FROM node:latest as node
-RUN mkdir /app
-WORKDIR /app
-RUN npm install
+FROM node:20
+RUN mkdir /usr/src/app
+WORKDIR /usr/src/app
+RUN npm install -g @angular/cli
 COPY . .
-RUN ng build --prod
-
-CMD ng serve --host 0.0.0.0 --port 4500

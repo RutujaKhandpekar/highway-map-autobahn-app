@@ -74,7 +74,7 @@ export class AppComponent {
 
   ngOnInit() {
     this.mapsData = this.mapService.getMapsDataOnLoad();
-    this.addMarker(false);
+    this.addMarker();
   }
 
   moveMap(event: google.maps.MapMouseEvent) {
@@ -89,19 +89,26 @@ export class AppComponent {
     filteredData: { [x: string]: any };
     selectedOption: string;
   }) {
+    this.markers = [];
     if (data.selectedOption === 'All') {
       this.mapsData = data.filteredData;
-      this.addMarker(true);
+      this.addMarker();
     } else {
       let result = data.filteredData[Object.keys(data.filteredData)[0]];
-      this.generateMarkerData(result, true);
+      this.generateMarkerData(result);
     }
   }
 
-  generateMarkerData(selectedRoadData: any, isFilteredResult: boolean) {
-    if (isFilteredResult) this.markers = [];
+  generateMarkerData(selectedRoadData: any) {
+    let icon = {
+      scale: 0.05,
+      strokeWeight: 0.2,
+      strokeOpacity: 1,
+      fillOpacity: 0.7,
+    };
     selectedRoadData?.forEach(
       (data: {
+        markerIcon: any;
         description: any;
         subtitle: any;
         startTimestamp: any;
@@ -117,7 +124,14 @@ export class AppComponent {
             lng: parseFloat(data.coordinate.long),
           },
           title: data.title,
-          options: { animation: google.maps.Animation.DROP },
+          options: {
+            animation: google.maps.Animation.DROP,
+            icon: {
+              ...icon,
+              path: selectedRoadData.markerIcon.path,
+              fillColor: selectedRoadData.markerIcon.color,
+            },
+          },
           subtitle: data.subtitle,
           startTimestamp: data.startTimestamp,
           identifier: data.identifier,
@@ -128,13 +142,10 @@ export class AppComponent {
     );
   }
 
-  addMarker(isFilteredResult: boolean) {
+  addMarker() {
     for (let road in this.mapsData) {
       for (let roadData in this.mapsData[road]) {
-        this.generateMarkerData(
-          this.mapsData[road][roadData],
-          isFilteredResult
-        );
+        this.generateMarkerData(this.mapsData[road][roadData]);
       }
     }
   }

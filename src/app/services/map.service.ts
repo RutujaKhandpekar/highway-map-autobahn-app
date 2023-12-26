@@ -47,12 +47,29 @@ export class MapService {
     let highwayData: any = {};
     highwayData.roadWorks = result[0].roadworks;
     if (highwayData && highwayData.roadWorks)
-      highwayData.roadWorks.label = 'ea3c';
+      highwayData.roadWorks.markerIcon = Constants.MARKER_ICON.Roadworks;
     highwayData.webCams = result[1].webcam;
+
+    if (highwayData && highwayData.webCams)
+      highwayData.webCams.markerIcon = Constants.MARKER_ICON.Webcams;
     highwayData.parkingLorries = result[2].parking_lorry;
+
+    if (highwayData && highwayData.parkingLorries)
+      highwayData.parkingLorries.markerIcon =
+        Constants.MARKER_ICON['Parking Lorry'];
     highwayData.warnings = result[3].warning;
+
+    if (highwayData && highwayData.warnings)
+      highwayData.warnings.markerIcon = Constants.MARKER_ICON.Warning;
     highwayData.closures = result[4].closure;
+
+    if (highwayData && highwayData.closures)
+      highwayData.closures.markerIcon = Constants.MARKER_ICON.Closure;
     highwayData.electricChargingStations = result[5].electric_charging_station;
+
+    if (highwayData && highwayData.electricChargingStations)
+      highwayData.electricChargingStations.markerIcon =
+        Constants.MARKER_ICON['Electric Charging Station'];
     return highwayData;
   }
 
