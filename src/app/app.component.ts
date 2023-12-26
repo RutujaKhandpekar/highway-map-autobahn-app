@@ -41,13 +41,40 @@ export class AppComponent {
   constructor(private mapService: MapService) {}
 
   openInfo(marker: MapMarker, data: any) {
-    this.infoContent = data.title;
+    let desc = data.description.join(',');
+    let content =
+      '<div>' +
+      '<h4>' +
+      data.displayType +
+      '</h4>' +
+      '<div>' +
+      '<div class="info-window-data">' +
+      '<div class="info-heading"><b>Title</b></div>' +
+      '<div class="info-details">' +
+      data.title +
+      '</div>' +
+      '</div>' +
+      '<div class="info-window-data">' +
+      '<div class="info-heading"><b>Sub Title</b></div>' +
+      '<div class="info-details">' +
+      data.subtitle +
+      '</div>' +
+      '</div>' +
+      '<div class="info-window-data">' +
+      '<div class="info-heading"><b>Description</b></div>' +
+      '<div class="info-details">' +
+      desc +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      '</div>';
+    this.infoContent = content;
     this.infoWindow.open(marker);
   }
 
   ngOnInit() {
-    this.mapsData = this.mapService.getMapsData();
-    this.addMarker();
+    this.mapsData = this.mapService.getMapsDataOnLoad();
+    this.addMarker(false);
   }
 
   moveMap(event: google.maps.MapMouseEvent) {
@@ -58,15 +85,24 @@ export class AppComponent {
     if (event.latLng != null) this.display = event.latLng.toJSON();
   }
 
-  updateMarker(filteredMarkerData: any) {
-    let data = filteredMarkerData[Object.keys(filteredMarkerData)[0]];
-    this.generateMarkerData(data, true);
+  updateMarker(data: {
+    filteredData: { [x: string]: any };
+    selectedOption: string;
+  }) {
+    if (data.selectedOption === 'All') {
+      this.mapsData = data.filteredData;
+      this.addMarker(true);
+    } else {
+      let result = data.filteredData[Object.keys(data.filteredData)[0]];
+      this.generateMarkerData(result, true);
+    }
   }
 
   generateMarkerData(selectedRoadData: any, isFilteredResult: boolean) {
     if (isFilteredResult) this.markers = [];
-    selectedRoadData.forEach(
+    selectedRoadData?.forEach(
       (data: {
+        description: any;
         subtitle: any;
         startTimestamp: any;
         identifier: any;
@@ -86,15 +122,19 @@ export class AppComponent {
           startTimestamp: data.startTimestamp,
           identifier: data.identifier,
           displayType: data.display_type,
+          description: data.description,
         });
       }
     );
   }
 
-  addMarker() {
+  addMarker(isFilteredResult: boolean) {
     for (let road in this.mapsData) {
       for (let roadData in this.mapsData[road]) {
-        this.generateMarkerData(this.mapsData[road][roadData], false);
+        this.generateMarkerData(
+          this.mapsData[road][roadData],
+          isFilteredResult
+        );
       }
     }
   }

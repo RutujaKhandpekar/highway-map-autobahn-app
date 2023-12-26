@@ -9,8 +9,7 @@ import { catchError, forkJoin, of } from 'rxjs';
 export class MapService {
   constructor(private http: HttpClient) {}
 
-  getHighwayData(roadId: any): any {
-    let highwayData: any = {};
+  getHighwayDataCallback(roadId: any): any {
     const getRoadworks = this.http
       .get(Constants.GET_HIGHWAYS + roadId + Constants.GET_ROADWORKS)
       .pipe(catchError((error) => of(error)));
@@ -34,27 +33,26 @@ export class MapService {
       )
       .pipe(catchError((error) => of(error)));
 
-    forkJoin([
+    return forkJoin([
       getRoadworks,
       getWebcams,
       getParkingLorries,
       getWarnings,
       getClosures,
       getElectricChargingStations,
-    ]).subscribe({
-      next: (result: any) => {
-        highwayData.roadWorks = result[0].roadworks;
-        if (highwayData && highwayData.roadWorks)
-          highwayData.roadWorks.label = 'ea3c';
-        highwayData.webCams = result[1].webcam;
-        highwayData.parkingLorries = result[2].parking_lorry;
-        highwayData.warnings = result[3].warning;
-        highwayData.closures = result[4].closure;
-        highwayData.electricChargingStations =
-          result[5].electric_charging_station;
-      },
-      error: (error) => console.log(error),
-    });
+    ]);
+  }
+
+  generateFinalResult(result: any[]): any {
+    let highwayData: any = {};
+    highwayData.roadWorks = result[0].roadworks;
+    if (highwayData && highwayData.roadWorks)
+      highwayData.roadWorks.label = 'ea3c';
+    highwayData.webCams = result[1].webcam;
+    highwayData.parkingLorries = result[2].parking_lorry;
+    highwayData.warnings = result[3].warning;
+    highwayData.closures = result[4].closure;
+    highwayData.electricChargingStations = result[5].electric_charging_station;
     return highwayData;
   }
 
@@ -63,11 +61,35 @@ export class MapService {
 
     this.http.get<any>(Constants.GET_HIGHWAYS).subscribe((highways) => {
       highways.roads.forEach((roadId: any) => {
-        mapsData[roadId] = this.getHighwayData(roadId);
+        this.getHighwayDataCallback(roadId).subscribe({
+          next: (result: any) => {
+            mapsData[roadId] = this.generateFinalResult(result);
+          },
+          error: (error: any) => console.log(error),
+        });
       });
     });
 
     return mapsData;
+  }
+
+  getMapsDataOnLoad(): any {
+    let mapsData: any = {};
+
+    this.http.get<any>(Constants.GET_HIGHWAYS).subscribe((highways) => {
+      this.getHighwayDataCallback(highways.roads[0]).subscribe({
+        next: (result: any) => {
+          mapsData[highways.roads[0]] = this.generateFinalResult(result);
+        },
+        error: (error: any) => console.log(error),
+      }); // be default 0th road is selected
+    });
+
+    return mapsData;
+  }
+
+  getMapsDataByRoad(road: any): any {
+    return this.getHighwayDataCallback(road);
   }
 
   getRoads(): any {

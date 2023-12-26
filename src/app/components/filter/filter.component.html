@@ -5,7 +5,7 @@
       <mat-label>Select Road</mat-label>
       <mat-select
         (selectionChange)="onRoadSelection($event.value)"
-        [(value)]="roads[0]"
+        [(value)]="selectedRoad"
       >
         @for (road of roads; track road) {
         <mat-option [value]="road">{{ road }}</mat-option>
@@ -15,6 +15,12 @@
   </div>
   <h5>Select Category</h5>
   <mat-radio-group aria-label="Select an option" class="example-radio-group">
+    <mat-radio-button
+      value="All"
+      (change)="onFilterSelection($event.value)"
+      checked="true"
+      >All</mat-radio-button
+    >
     @for (filter of roadFilters; track filter) {
     <mat-radio-button
       [value]="filter"
