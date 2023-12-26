@@ -1,0 +1,12 @@
+version: "3.5"
+
+services:
+  highway-service:
+    container_name: highway-service-container
+    build: .
+    volumes:
+      - ".:/usr/src/app"
+    ports:
+      - "4500:4500"
+    command: >
+      bash -c "npm install && ng serve --host 0.0.0.0 --port 4500"
