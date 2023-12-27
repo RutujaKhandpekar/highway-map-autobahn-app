@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 @Injectable()
 export class Constants {
+  public static GERMANY_CENTER_LAT_LONG = {
+    // center lat long of Germany
+    lat: 51.1657,
+    lng: 10.4515,
+  };
+  public static MAP_ZOOM = 6;
   public static ROAD_FILTERS = [
     'Roadworks',
     'Webcams',
